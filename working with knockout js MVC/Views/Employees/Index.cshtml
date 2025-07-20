@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Employees";
+}
+<h2>Employees (Knockout CRUD)</h2>
+
+<div>
+    <input type="text" placeholder="Name" data-bind="value: name" />
+    <input type="text" placeholder="Department" data-bind="value: department" />
+    <input type="number" placeholder="Age" data-bind="value: age" />
+    <button data-bind="click: addEmployee">Add</button>
+</div>
+
+<table>
+    <thead>
+        <tr><th>Name</th><th>Dept</th><th>Age</th><th>Actions</th></tr>
+    </thead>
+    <tbody data-bind="foreach: employees">
+        <tr>
+            <td><input data-bind="value: name" /></td>
+            <td><input data-bind="value: department" /></td>
+            <td><input data-bind="value: age" type="number" /></td>
+            <td>
+                <button data-bind="click: $parent.updateEmployee">Save</button>
+                <button data-bind="click: $parent.deleteEmployee">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<script src="~/js/knockout-3.5.1.js" asp-append-version="true"></script>
+
+    <script>
+        debugger;
+        function Employee(data) {
+            this.id = data.id || 0;
+            this.name = ko.observable(data.name || "");
+            this.department = ko.observable(data.department || "");
+            this.age = ko.observable(data.age || 0);
+        }
+
+        function AppViewModel() {
+            var self = this;
+                    debugger;
+
+            self.employees = ko.observableArray([]);
+            self.name = ko.observable("");
+            self.department = ko.observable("");
+            self.age = ko.observable("");
+
+            self.loadEmployees = function () {
+                fetch('/Employees/GetAll')
+                    .then(res => res.json())
+                    .then(data => {
+                        const mapped = data.map(e => new Employee(e));
+                        self.employees(mapped);
+                    });
+            };
+
+            self.addEmployee = function () {
+                const emp = {
+                    name: self.name(),
+                    department: self.department(),
+                    age: self.age()
+                };
+
+                fetch('/Employees/Create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(emp)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    self.employees.push(new Employee(data));
+                    self.name(""); self.department(""); self.age("");
+                });
+            };
+
+            self.updateEmployee = function (emp) {
+                fetch('/Employees/Update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: emp.id,
+                        name: emp.name(),
+                        department: emp.department(),
+                        age: emp.age()
+                    })
+                });
+            };
+
+            self.deleteEmployee = function (emp) {
+                fetch(`/Employees/Delete?id=${emp.id}`, {
+                    method: 'POST'
+                })
+                .then(() => self.employees.remove(emp));
+            };
+
+            self.loadEmployees();
+        }
+
+        ko.applyBindings(new AppViewModel());
+    </script>
