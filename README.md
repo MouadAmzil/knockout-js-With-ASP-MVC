@@ -16,24 +16,38 @@ This is a simple example of an ASP.NET Core MVC application integrated with **Kn
 ## 📂 Project Structure
 
 /MyMvcKnockoutApp
+
 │
 ├── Controllers/
+
 │ └── HomeController.cs
+
 │
 ├── Models/
+
 │ └── Employee.cs
+
 │
 ├── Views/
+
 │ └── Home/
+
 │ └── Index.cshtml
+
 │
 ├── wwwroot/
+
 │ └── lib/
+
 │ └── knockout/
+
 │ └── knockout-min.js
+
 │
 ├── Program.cs
+
 ├── Startup.cs (if using older .NET Core)
+
 └── README.md
 
 
